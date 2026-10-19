@@ -36,6 +36,5 @@
   benchmarks are included. Short local campaigns and timing samples are evidence,
   not proof of correctness or a performance guarantee on other machines. See
   [testing](testing.md) and [performance](performance.md).
-- Cross-platform verification, a security review, a full Nix build with recent
-  nixpkgs, nixpkgs/crates.io publication, and devenv integration remain separate
-  work. The executable has no network service, daemon, or telemetry.
+- A security review, a full Nix build with recent nixpkgs, nixpkgs publication,
+  and devenv integration remain separate work. The executable has no network service, daemon, or telemetry.

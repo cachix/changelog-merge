@@ -5,6 +5,10 @@ edition = "2024"
 rust-version = "1.88"
 license = "Apache-2.0"
 repository = "https://github.com/cachix/changelog-merge"
+documentation = "https://docs.rs/changelog-merge"
+readme = "README.md"
+keywords = ["changelog", "git", "merge", "markdown"]
+categories = ["command-line-utilities", "development-tools"]
 description = "Source-preserving semantic three-way merging for Keep a Changelog"
 
 [dependencies]

@@ -1,1 +1,4 @@
 CHANGELOG.md merge=changelog-merge
+
+# Keep source and fixture bytes consistent on every CI platform.
+* text=auto eol=lf

@@ -17,6 +17,7 @@ concurrency:
 env:
   CARGO_TERM_COLOR: always
   RUST_BACKTRACE: '1'
+  PROPTEST_CASES: '1024'
 
 jobs:
   test:

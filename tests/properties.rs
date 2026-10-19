@@ -73,3 +73,66 @@ proptest! {
         prop_assert_eq!(&result.content,&merge(&base,&theirs,&ours,&MergeOptions::default()).unwrap().content);
     }
 }
+
+#[test]
+fn overlapping_moves_preserve_both_branch_orders() {
+    let base = operation_document(&[0, 0, 0, 0], "");
+    let ours = operation_document(&[3, 3, 3, 0], "");
+    let theirs = operation_document(&[0, 0, 3, 3], "");
+    let result = merge(&base, &ours, &theirs, &MergeOptions::default()).unwrap();
+    assert!(result.conflicts.is_empty(), "{:?}", result.conflicts);
+    let swapped = merge(&base, &theirs, &ours, &MergeOptions::default()).unwrap();
+    assert!(swapped.conflicts.is_empty());
+    assert_eq!(result.content, swapped.content);
+    let doc = parse(&result.content).unwrap();
+    let fixed = &doc.releases[0].categories[1];
+    assert_eq!(fixed.entries.len(), 4);
+    for (i, entry) in fixed.entries.iter().enumerate() {
+        assert!(
+            entry
+                .span
+                .text(&doc.source)
+                .contains(&format!("unique_identifier_{i} "))
+        );
+    }
+}
+
+#[test]
+fn every_four_entry_move_overlap_preserves_order() {
+    for mask in 0..256u16 {
+        let ours: Vec<_> = (0..4)
+            .map(|i| if mask & (1 << i) != 0 { 3 } else { 0 })
+            .collect();
+        let theirs: Vec<_> = (0..4)
+            .map(|i| if mask & (1 << (i + 4)) != 0 { 3 } else { 0 })
+            .collect();
+        let base = operation_document(&[0; 4], "");
+        let o = operation_document(&ours, "");
+        let t = operation_document(&theirs, "");
+        let result = merge(&base, &o, &t, &MergeOptions::default()).unwrap();
+        assert!(
+            result.conflicts.is_empty(),
+            "mask {mask}: {:?}",
+            result.conflicts
+        );
+        let swapped = merge(&base, &t, &o, &MergeOptions::default()).unwrap();
+        assert!(swapped.conflicts.is_empty());
+        assert_eq!(result.content, swapped.content, "mask {mask}");
+        let doc = parse(&result.content).unwrap();
+        for category in &doc.releases[0].categories {
+            let mut previous = None;
+            for entry in &category.entries {
+                let index = (0..4)
+                    .find(|i| {
+                        entry
+                            .span
+                            .text(&doc.source)
+                            .contains(&format!("unique_identifier_{i} "))
+                    })
+                    .unwrap();
+                assert!(previous.is_none_or(|p| p < index), "mask {mask}");
+                previous = Some(index);
+            }
+        }
+    }
+}

@@ -68,7 +68,10 @@ removal, and moves against concurrent modification conflict.
 Unambiguous moves relocate the corresponding base identity and unchanged
 counterpart into a virtual destination. Destination anchors are matched in bulk,
 and source-local spans retain their original ownership. Branch ordering at an
-existing destination remains intact. Empty source sections removed by the moving
+existing destination remains intact. Injected virtual counterparts contribute content
+identity, but no ordering constraints at their destination. Only original branch
+sequences establish moved-entry order; ties retain original base source positions.
+Empty source sections removed by the moving
 branch may disappear; independent new entries in those sections remain.
 
 ## Release cuts

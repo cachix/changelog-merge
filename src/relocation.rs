@@ -312,6 +312,7 @@ fn rebuild(doc: &mut Node, level: usize) {
     }
     render::append(&mut raw, &doc.suffix);
     doc.raw = raw;
+    doc.virtual_order = doc.children.iter().any(|c| c.virtual_order);
 }
 fn relocate(
     doc: &mut Node,
@@ -407,9 +408,10 @@ fn relocate(
                 }
             }
             for p in items {
-                let item = leaf(original, &source(p))
+                let mut item = leaf(original, &source(p))
                     .expect("validated source")
                     .clone();
+                item.virtual_order = true;
                 let reference_index = if virtual_base.is_some() {
                     *reference_positions
                         .get(p.key.as_str())
@@ -424,7 +426,7 @@ fn relocate(
             }
         }
         for values in slots.values_mut() {
-            if branch.is_none() && !existing_category {
+            if branch.is_none() {
                 values.sort_by(|(a, _), (b, _)| a.origin.cmp(&b.origin));
             } else {
                 values.sort_by(|(a, _), (b, _)| a.target.cmp(&b.target).then(a.key.cmp(&b.key)));

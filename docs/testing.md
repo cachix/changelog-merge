@@ -79,3 +79,8 @@ job checks the minimum supported Rust version, 1.88.0. Formatting, Clippy, fuzz-
 linting, and a build of the packaged crate run on Linux. Git test configuration is
 supplied through the environment, with automatic line-ending conversion and commit
 signing disabled for isolated test repositories.
+
+Property tests run 1,024 cases per property on each CI test job. A deterministic
+regression checks overlapping moves, and an exhaustive test covers all 256
+four-entry move combinations. Source fixtures use LF checkout rules; explicit
+CRLF and mixed-ending cases are constructed in tests.

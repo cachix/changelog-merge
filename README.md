@@ -20,18 +20,20 @@ When separate branches add the S3 and SSH entries above, both survive. Concurren
 additions retain each branch's order. Available entries are selected by canonical
 source bytes to break ordering ties, independent of which branch is ours.
 
-## Build and use
+## Install and use
 
 Requires Rust 1.88 or newer.
 
 ```sh
-cargo build --release --locked
-cargo install --path . --locked
+cargo install changelog-merge --version 0.1.0 --locked
 changelog-merge check CHANGELOG.md
 changelog-merge merge base.md ours.md theirs.md
 changelog-merge merge base.md ours.md theirs.md --output merged.md
 changelog-merge merge base.md ours.md theirs.md --output - --diagnostics json
 ```
+
+To build from this repository, use `cargo build --release --locked` or
+`cargo install --path . --locked`.
 
 The default output is `ours.md`. `--output -` writes Markdown to stdout and leaves
 the inputs alone. Diagnostics use stderr. `--explain` reports per-entry changes,
@@ -84,8 +86,9 @@ independent opaque lines and reference definitions merge. Competing edits or
 uncertain identity/membership remain visible conflicts.
 
 Read [merge semantics](docs/merge-semantics.md) and
-[limitations](docs/limitations.md) before adoption. Production hardening still
-includes cross-platform verification and independent security review.
+[limitations](docs/limitations.md) before adoption. [CI](https://github.com/cachix/changelog-merge/actions/workflows/ci.yml)
+tests Linux, macOS, Windows, and the minimum supported Rust version. Independent
+security review remains part of production hardening.
 
 ## Nix
 

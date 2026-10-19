@@ -24,6 +24,9 @@ pub(crate) struct Node {
     pub(crate) children: Vec<Node>,
     pub(crate) span: Option<Span>,
     pub(crate) opaque: bool,
+    // Relocated counterparts carry content identity, but no destination ordering intent.
+    // Containers propagate this flag so raw equality cannot bypass order reconciliation.
+    pub(crate) virtual_order: bool,
     pub(crate) head_span: Option<Span>,
     pub(crate) prefix_span: Option<Span>,
     pub(crate) suffix_span: Option<Span>,
@@ -62,6 +65,7 @@ fn category(c: &Category, s: &str) -> Node {
         head_span: Some(c.heading),
         prefix_span: Some(c.prefix),
         suffix_span: Some(c.suffix),
+        virtual_order: false,
     }
 }
 fn document(d: &Document) -> Node {
@@ -229,11 +233,12 @@ impl Engine<'_> {
         )
     }
     fn node(&mut self, b: &Node, o: &Node, t: &Node, level: usize) -> String {
-        if o.raw == t.raw || t.raw == b.raw {
+        let preserve_order = level < 3 && (b.virtual_order || o.virtual_order || t.virtual_order);
+        if !preserve_order && (o.raw == t.raw || t.raw == b.raw) {
             self.select(o, level);
             return o.raw.clone();
         }
-        if o.raw == b.raw {
+        if !preserve_order && o.raw == b.raw {
             self.select(t, level);
             return t.raw.clone();
         }
@@ -406,6 +411,7 @@ impl Engine<'_> {
                 "strict mode rejects inferred entry edits",
             ));
         }
+        let base_id = |i: usize| format!("b:{:020}", b.children[i].span.map_or(i, |s| s.start));
         let mut values = BTreeMap::new();
         let mut selected = BTreeSet::new();
         for i in 0..b.children.len() {
@@ -414,7 +420,7 @@ impl Engine<'_> {
             let tn = ta.matched[i].map_or(&empty, |j| &t.children[j]);
             let value = self.node(&b.children[i], on, tn, 3);
             if !value.is_empty() {
-                let id = format!("b:{i:020}");
+                let id = base_id(i);
                 selected.insert(id.clone());
                 values.insert(id, value);
             }
@@ -448,7 +454,7 @@ impl Engine<'_> {
             }
             for (j, child) in branch.children.iter().enumerate() {
                 let id = if let Some(i) = reverse.get(&j) {
-                    format!("b:{i:020}")
+                    base_id(*i)
                 } else {
                     let canonical = child.raw.replace("\r\n", "\n");
                     let anchor = format!("{:?}:{:?}", before[j], after[j]);
@@ -471,14 +477,15 @@ impl Engine<'_> {
                     selected.insert(id.clone());
                     id
                 };
-                if selected.contains(&id) {
+                if selected.contains(&id) && !child.virtual_order {
                     sequence.push(id);
                 }
             }
             sequences.push(sequence);
         }
         let base_order: Vec<_> = (0..b.children.len())
-            .map(|i| format!("b:{i:020}"))
+            .filter(|&i| !b.children[i].virtual_order)
+            .map(base_id)
             .filter(|id| selected.contains(id))
             .collect();
         let Some(order) = ordering::three_way(&base_order, &sequences[0], &sequences[1]) else {

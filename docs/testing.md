@@ -70,3 +70,12 @@ exited successfully:
 Earlier thirty-second campaigns also completed without failures. Execution counts
 vary with machine load and corpus evolution. These short runs do not replace
 longer fuzzing or sanitizer-backed validation.
+
+## Continuous integration
+
+GitHub Actions runs the complete test suite, including actual Git operations and
+release builds, on Linux, macOS, and Windows with stable Rust. A separate Linux
+job checks the minimum supported Rust version, 1.88.0. Formatting, Clippy, fuzz-target
+linting, and a build of the packaged crate run on Linux. Git test configuration is
+supplied through the environment, with automatic line-ending conversion and commit
+signing disabled for isolated test repositories.

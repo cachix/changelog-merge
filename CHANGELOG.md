@@ -8,6 +8,8 @@ The format follows Keep a Changelog 1.1.
 
 ### Added
 
+- Cross-platform GitHub Actions CI for Linux, macOS, Windows, and Rust 1.88.0.
+
 - Source-preserving Markdown parser and conservative semantic three-way merge library.
 - Git merge-driver CLI with diff3 conflicts, atomic output, and JSON diagnostics.
 - Parser, merge, property, CLI, and real Git integration tests.

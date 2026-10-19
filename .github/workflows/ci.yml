@@ -1,0 +1,70 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+    tags: ['v*']
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  CARGO_TERM_COLOR: always
+  RUST_BACKTRACE: '1'
+
+jobs:
+  test:
+    name: Test (${{ matrix.os }}, Rust ${{ matrix.rust }})
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, macos-latest, windows-latest]
+        rust: [stable]
+        include:
+          - os: ubuntu-latest
+            rust: '1.88.0'
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 20
+    env:
+      RUSTUP_TOOLCHAIN: ${{ matrix.rust }}
+    steps:
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+        with:
+          persist-credentials: false
+      - name: Install Rust
+        run: rustup toolchain install ${{ matrix.rust }} --profile minimal
+      - name: Test library, CLI, properties, and real Git workflows
+        run: cargo test --locked
+      - name: Check every build target
+        run: cargo check --all-targets --locked
+      - name: Build release binary
+        run: cargo build --release --locked
+
+  quality:
+    name: Formatting, Clippy, and package
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    env:
+      RUSTUP_TOOLCHAIN: stable
+    steps:
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+        with:
+          persist-credentials: false
+      - name: Install Rust tools
+        run: rustup toolchain install stable --profile minimal --component rustfmt --component clippy
+      - name: Check formatting
+        run: |
+          cargo fmt --check
+          cargo fmt --manifest-path fuzz/Cargo.toml --check
+      - name: Lint library, CLI, tests, and benchmarks
+        run: cargo clippy --all-targets --locked -- -D warnings
+      - name: Lint fuzz targets
+        run: cargo clippy --manifest-path fuzz/Cargo.toml --bins --locked -- -D warnings
+      - name: Verify distributable package
+        run: cargo package --locked

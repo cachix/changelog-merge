@@ -10,7 +10,9 @@ struct Repo {
 fn driver() -> String {
     format!(
         "'{}' merge %O %A %B --marker-size %L --path %P",
-        env!("CARGO_BIN_EXE_changelog-merge").replace('\'', "'\\''")
+        env!("CARGO_BIN_EXE_changelog-merge")
+            .replace('\\', "/")
+            .replace('\'', "'\\''")
     )
 }
 fn git(root: &Path, args: &[&str]) -> Output {
@@ -18,18 +20,25 @@ fn git(root: &Path, args: &[&str]) -> Output {
         .args(args)
         .current_dir(root)
         .env("GIT_CONFIG_NOSYSTEM", "1")
-        .env("GIT_CONFIG_GLOBAL", "/dev/null")
+        .env(
+            "GIT_CONFIG_GLOBAL",
+            if cfg!(windows) { "NUL" } else { "/dev/null" },
+        )
         .env("GIT_AUTHOR_NAME", "Test")
         .env("GIT_AUTHOR_EMAIL", "test@example.invalid")
         .env("GIT_COMMITTER_NAME", "Test")
         .env("GIT_COMMITTER_EMAIL", "test@example.invalid")
-        .env("GIT_CONFIG_COUNT", "3")
+        .env("GIT_CONFIG_COUNT", "5")
         .env("GIT_CONFIG_KEY_0", "merge.changelog-merge.name")
         .env("GIT_CONFIG_VALUE_0", "Keep a Changelog semantic merger")
         .env("GIT_CONFIG_KEY_1", "merge.changelog-merge.driver")
         .env("GIT_CONFIG_VALUE_1", driver())
         .env("GIT_CONFIG_KEY_2", "merge.changelog-merge.recursive")
         .env("GIT_CONFIG_VALUE_2", "binary")
+        .env("GIT_CONFIG_KEY_3", "core.autocrlf")
+        .env("GIT_CONFIG_VALUE_3", "false")
+        .env("GIT_CONFIG_KEY_4", "commit.gpgsign")
+        .env("GIT_CONFIG_VALUE_4", "false")
         .output()
         .unwrap()
 }

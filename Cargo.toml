@@ -1,0 +1,25 @@
+[package]
+name = "changelog-merge"
+version = "0.1.0"
+edition = "2024"
+rust-version = "1.88"
+license = "Apache-2.0"
+repository = "https://github.com/cachix/changelog-merge"
+description = "Source-preserving semantic three-way merging for Keep a Changelog"
+
+[dependencies]
+pulldown-cmark = { version = "0.13", default-features = false }
+clap = { version = "4", features = ["derive"] }
+thiserror = "2"
+blake3 = "1"
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+tempfile = "3"
+similar = "2.7"
+
+[dev-dependencies]
+proptest = "1"
+
+[[bench]]
+name = "merge"
+harness = false

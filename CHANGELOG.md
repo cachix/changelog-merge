@@ -1,0 +1,23 @@
+# Changelog
+
+All notable changes to this project are documented here.
+
+The format follows Keep a Changelog 1.1.
+
+## [Unreleased]
+
+### Added
+
+- Source-preserving Markdown parser and conservative semantic three-way merge library.
+- Git merge-driver CLI with diff3 conflicts, atomic output, and JSON diagnostics.
+- Parser, merge, property, CLI, and real Git integration tests.
+- Local Nix package definition.
+
+### Changed
+
+- Reconcile unambiguous release cuts while retaining independent post-cut work.
+- Match larger rewrite gaps, section renames, edited moves, and compatible reorders.
+- Preserve interleaved opaque Markdown and merge reference definitions independently.
+- Retain one-sided whitespace changes and untouched mixed line endings.
+- Report structured merge events and validate entry membership and reference inventories.
+- Add coverage-guided fuzz targets, failure-path tests, bounded matching, and benchmarks.

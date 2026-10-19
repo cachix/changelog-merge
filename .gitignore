@@ -1,0 +1,8 @@
+/target/
+/result
+/fuzz/target/
+/fuzz/artifacts/
+/fuzz/corpus/
+/.agents/
+/.aws/
+/.codex/

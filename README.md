@@ -1,10 +1,6 @@
 # changelog-merge
 
-Semantic three-way merging for Keep a Changelog, written in Rust. Contributors
-continue editing `CHANGELOG.md` directly. Independent list entries merge together;
-incompatible edits produce ordinary Git conflict markers with base context.
-
-Initial version: 0.1.0. Licensed under Apache-2.0.
+Semantic three-way merging for Keep a Changelog, written in Rust. 
 
 ```markdown
 ## [Unreleased]
@@ -90,11 +86,15 @@ Read [merge semantics](docs/merge-semantics.md) and
 tests Linux, macOS, Windows, and the minimum supported Rust version. Independent
 security review remains part of production hardening.
 
-## Nix
+## Nix using devenv
 
-`nix-build` builds the local `default.nix` package, using `Cargo.lock` and running
-the tests with Git available. Supply a pinned `pkgs` argument for reproducible
-nixpkgs selection with Rust 1.88 or newer. No devenv configuration is included yet.
+To configure git only need:
+
+```nix
+{
+  changelog-merge.enable = true;
+}
+```
 
 ## Development
 

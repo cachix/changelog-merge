@@ -67,25 +67,6 @@ the executable and runtime configuration for semantic behavior. The CLI never
 runs Git or changes Git configuration. See [Git integration](docs/git-integration.md)
 for a configuration that leaves `.git/config` and global settings untouched.
 
-## Semantics and limits
-
-Multiline entries, nested lists, code fences, Unicode, custom categories, and
-reference links retain their original Markdown source. The engine merges releases,
-categories, and entries relative to the common ancestor. Exact matching preserves
-base duplicate occurrences by position. Larger rewrite gaps use conservative,
-unique candidate matching. One-sided renames, compatible reorders, and unambiguous
-moves merge without rewriting their entry bodies.
-
-Release cuts keep released entries in the new version and independent new work
-in `Unreleased`. Opaque paragraphs/comments between entries are retained, and
-independent opaque lines and reference definitions merge. Competing edits or
-uncertain identity/membership remain visible conflicts.
-
-Read [merge semantics](docs/merge-semantics.md) and
-[limitations](docs/limitations.md) before adoption. [CI](https://github.com/cachix/changelog-merge/actions/workflows/ci.yml)
-tests Linux, macOS, Windows, and the minimum supported Rust version. Independent
-security review remains part of production hardening.
-
 ## Nix using devenv
 
 To configure git only need:
@@ -116,3 +97,23 @@ cargo bench --locked --bench merge
 ```
 
 See [performance](docs/performance.md) for workloads and measured local results.
+
+
+## Semantics and limits
+
+Multiline entries, nested lists, code fences, Unicode, custom categories, and
+reference links retain their original Markdown source. The engine merges releases,
+categories, and entries relative to the common ancestor. Exact matching preserves
+base duplicate occurrences by position. Larger rewrite gaps use conservative,
+unique candidate matching. One-sided renames, compatible reorders, and unambiguous
+moves merge without rewriting their entry bodies.
+
+Release cuts keep released entries in the new version and independent new work
+in `Unreleased`. Opaque paragraphs/comments between entries are retained, and
+independent opaque lines and reference definitions merge. Competing edits or
+uncertain identity/membership remain visible conflicts.
+
+Read [merge semantics](docs/merge-semantics.md) and
+[limitations](docs/limitations.md) before adoption. [CI](https://github.com/cachix/changelog-merge/actions/workflows/ci.yml)
+tests Linux, macOS, Windows, and the minimum supported Rust version. Independent
+security review remains part of production hardening.
